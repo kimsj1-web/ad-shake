@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>단백질쉐이크 고효율 광고 아카이브</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg:#0F0F12; --surface:#1A1A20; --border:#2A2A35; --text:#F0F0F5; --muted:#8A8A9A; }
+  body { background:var(--bg); color:var(--text); font-family:'Pretendard',-apple-system,sans-serif; min-height:100vh; }
+  header { padding:40px 32px 24px; border-bottom:1px solid var(--border); display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+  .header-left h1 { font-size:22px; font-weight:700; letter-spacing:-0.5px; }
+  .header-left p { margin-top:4px; font-size:13px; color:var(--muted); }
+  .updated { font-size:12px; color:var(--muted); }
+  .controls { padding:16px 32px 0; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .filter-label { font-size:11px; color:var(--muted); margin-right:2px; }
+  .filter-btn { padding:6px 16px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--muted); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .filter-btn:hover { border-color:#555; color:var(--text); }
+  .filter-btn.active { background:var(--text); color:var(--bg); border-color:var(--text); font-weight:600; }
+  .divider { width:1px; height:20px; background:var(--border); margin:0 4px; }
+  .count { margin-left:auto; font-size:13px; color:var(--muted); }
+  .product-filters { padding:10px 32px 16px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .gallery { padding:8px 32px 60px; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:transform .2s,box-shadow .2s; }
+  .card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(0,0,0,.4); }
+  .card-img { position:relative; background:#111; overflow:hidden; display:flex; align-items:center; justify-content:center; min-height:200px; }
+  .card-img img { width:100%; height:auto; display:block; object-fit:contain; }
+  .no-img { width:100%; height:200px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; }
+  .grade-badge { position:absolute; top:10px; right:10px; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; color:#fff; }
+  .play-icon { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:54px; height:54px; border-radius:50%; background:rgba(0,0,0,.55); border:2px solid rgba(255,255,255,.9); color:#fff; font-size:20px; display:flex; align-items:center; justify-content:center; padding-left:4px; pointer-events:none; transition:background .15s; }
+  .card.has-video { cursor:pointer; }
+  .card.has-video:hover .play-icon { background:rgba(0,0,0,.8); }
+  .modal { position:fixed; inset:0; background:rgba(0,0,0,.85); display:none; align-items:center; justify-content:center; z-index:1000; padding:24px; }
+  .modal.open { display:flex; }
+  .modal video { max-width:90vw; max-height:85vh; border-radius:8px; background:#000; }
+  .modal-close { position:absolute; top:20px; right:28px; font-size:32px; color:#fff; cursor:pointer; line-height:1; background:none; border:none; }
+  .card-body { padding:16px; }
+  .ad-name { font-size:11px; color:var(--muted); margin-bottom:12px; line-height:1.5; word-break:break-all; }
+  .metrics { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .metric { display:flex; flex-direction:column; gap:2px; }
+  .metric .label { font-size:10px; color:var(--muted); letter-spacing:0.5px; }
+  .metric .value { font-size:13px; font-weight:600; display:flex; align-items:center; gap:4px; }
+  .status-dot { width:6px; height:6px; border-radius:50%; display:inline-block; flex-shrink:0; }
+  .status-txt { font-size:11px; font-weight:500; }
+  .periods { margin-top:10px; display:flex; flex-wrap:wrap; gap:4px; }
+  .period-tag { font-size:10px; color:var(--muted); border:1px solid var(--border); border-radius:4px; padding:1px 6px; }
+  .empty { grid-column:1/-1; text-align:center; padding:80px 0; color:var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-left">
+    <h1>전환배너 고효율 광고 아카이브</h1>
+    <p>누적 조회: 2026-05-27~2026-06-26</p>
+  </div>
+  <span class="updated">마지막 업데이트: 2026-06-26 14:21 (KST)</span>
+</header>
+<div class="controls">
+  <span class="filter-label">유형</span>
+  <button class="filter-btn media-btn active" data-media="image">이미지</button>
+  <button class="filter-btn media-btn" data-media="video">영상</button>
+  <div class="divider"></div>
+  <span class="filter-label">등급</span>
+  <button class="filter-btn grade-btn active" data-grade="all">전체</button>
+  <button class="filter-btn grade-btn" data-grade="SS급">SS급</button>
+  <button class="filter-btn grade-btn" data-grade="S급">S급</button>
+  <button class="filter-btn grade-btn" data-grade="A급">A급</button>
+  <button class="filter-btn grade-btn" data-grade="B급">B급</button>
+  <div class="divider"></div>
+  <button class="filter-btn grade-btn" data-grade="성공">성공</button>
+  <button class="filter-btn grade-btn" data-grade="불씨">불씨</button>
+  <span class="count" id="count"></span>
+</div>
+<div class="product-filters">
+  <span class="filter-label">제품군</span>
+  <button class="filter-btn product-btn active" data-product="all">전체</button>
+  <button class="filter-btn product-btn" data-product="빙과">빙과</button>
+  <button class="filter-btn product-btn" data-product="제과">제과</button>
+</div>
+<div class="gallery" id="gallery">
+  
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_라라스윗권위_.배너_저당.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_라라스윗권위_.배너_저당.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">496,981원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">165,660원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">477원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">79</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">6,291원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">7.58%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">3일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var4.릴스_혜택.X_2P_이유빈_260624_제과_이봄1_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var4.릴스_혜택.X_2P_이유빈_260624_제과_이봄1_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var4.릴스_혜택.X_2P_이유빈_260624_제과_이봄1</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">306,890원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">153,445원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">582원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">46</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">6,672원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">8.73%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var1.릴스_브랜드권위.X_2P_이유빈_260624_제과_윤성미_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var1.릴스_브랜드권위.X_2P_이유빈_260624_제과_윤성미_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var1.릴스_브랜드권위.X_2P_이유빈_260624_제과_윤성미</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">148,521원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">74,260원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">519원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">14</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">10,609원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">4.90%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var7.릴스_소비자VOC.숏.X_2P_이유빈_260624_제과_윤성미_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var7.릴스_소비자VOC.숏.X_2P_이유빈_260624_제과_윤성미_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var7.릴스_소비자VOC.숏.X_2P_이유빈_260624_제과_윤성미</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">143,029원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">47,676원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">314원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">15</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">9,535원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">3.30%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">3일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var4.릴스_맛강조.X_2P_이유빈_260624_제과_윤성미_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var4.릴스_맛강조.X_2P_이유빈_260624_제과_윤성미_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var4.릴스_맛강조.X_2P_이유빈_260624_제과_윤성미</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">124,383원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">62,192원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">392원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">17</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">7,317원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">5.36%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_씽크99.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_씽크99.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">121,633원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">60,816원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">599원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">13</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">9,356원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">6.40%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var8.릴스_기대감.X_2P_이유빈_260624_제과_윤성미_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var8.릴스_기대감.X_2P_이유빈_260624_제과_윤성미_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var8.릴스_기대감.X_2P_이유빈_260624_제과_윤성미</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">120,202원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">40,067원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">331원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">16</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">7,513원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">4.41%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">3일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_맛보기.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_맛보기.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">109,088원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">109,088원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">503원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">12</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">9,091원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">5.53%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_매거진형_라라스윗권위_.배너_저당.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_매거진형_라라스윗권위_.배너_저당.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">103,643원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">51,822원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">537원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">12</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">8,637원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">6.22%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_딱.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_딱.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">99,144원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">49,572원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">545원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">15</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">6,610원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">8.24%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_공식몰한정.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_공식몰한정.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">89,653원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">44,826원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">1,042원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">11</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">8,150원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">12.79%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var5.릴스_다이어터.X_2P_이유빈_260624_제과_이미진_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var5.릴스_다이어터.X_2P_이유빈_260624_제과_이미진_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var5.릴스_다이어터.X_2P_이유빈_260624_제과_이미진</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">75,187원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">37,594원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">835원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">4</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">18,797원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">4.44%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_main.릴스_본론.X_2P_이유빈_260624_제과_이봄1_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_main.릴스_본론.X_2P_이유빈_260624_제과_이봄1_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_main.릴스_본론.X_2P_이유빈_260624_제과_이봄1</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">73,721원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">36,860원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">683원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">6</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">12,287원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">5.56%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var3.릴스_취식.X_2P_이유빈_260624_제과_이봄1_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var3.릴스_취식.X_2P_이유빈_260624_제과_이봄1_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var3.릴스_취식.X_2P_이유빈_260624_제과_이봄1</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">71,805원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">35,902원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">524원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">7</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">10,258원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">5.11%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var6.릴스_공통부터.X_2P_이유빈_260624_제과_이미진_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var6.릴스_공통부터.X_2P_이유빈_260624_제과_이미진_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var6.릴스_공통부터.X_2P_이유빈_260624_제과_이미진</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">63,992원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">31,996원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">970원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">7</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">9,142원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">10.61%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_원물토핑.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_원물토핑.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">56,945원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">56,945원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">347원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">9</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">6,327원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">5.49%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트4.카페시럽.펌핑.__이유빈_260625_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트4.카페시럽.펌핑.__이유빈_260625_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">50,048원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">50,048원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">582원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">7</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">7,150원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">8.14%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_매거진형_라라스윗권위_.배너_속세맛.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_매거진형_라라스윗권위_.배너_속세맛.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">46,771원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">46,771원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">487원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">14</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">3,341원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">14.58%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var5.릴스_초코바1위 권위.X_2P_이유빈_260624_제과_이봄1_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var5.릴스_초코바1위 권위.X_2P_이유빈_260624_제과_이봄1_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var5.릴스_초코바1위 권위.X_2P_이유빈_260624_제과_이봄1</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">44,490원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">44,490원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">781원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">44,490원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">1.75%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_곡물아는맛_.배너_미숫가루.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_곡물아는맛_.배너_미숫가루.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">42,299원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">42,299원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">961원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">4</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">10,575원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">9.09%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트2.꿀.조합.__이유빈_260625_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트2.꿀.조합.__이유빈_260625_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">41,312원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">41,312원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">1,059원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">2</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">20,656원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">5.13%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트3.건강관리.무서워.__이유빈_260625_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트3.건강관리.무서워.__이유빈_260625_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">40,188원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">40,188원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">744원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">5</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">8,038원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">9.26%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var5.릴스_혜택.X_2P_이유빈_260624_제과_윤성미_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var5.릴스_혜택.X_2P_이유빈_260624_제과_윤성미_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var5.릴스_혜택.X_2P_이유빈_260624_제과_윤성미</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">38,749원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">19,374원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">596원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">4</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">9,687원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">6.15%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_곡물속세맛_.배너_꼬숩두유.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_곡물속세맛_.배너_꼬숩두유.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">36,541원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">36,541원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">1,015원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">36,541원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">2.78%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var4.릴스_선착순맛보기팩.X_2P_이유빈_260624_제과_이미진_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var4.릴스_선착순맛보기팩.X_2P_이유빈_260624_제과_이미진_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var4.릴스_선착순맛보기팩.X_2P_이유빈_260624_제과_이미진</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">36,496원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">36,496원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">608원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">36,496원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">1.67%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_main.릴스_브랜드권위.X_2P_이유빈_260624_제과_이미진_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_main.릴스_브랜드권위.X_2P_이유빈_260624_제과_이미진_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_main.릴스_브랜드권위.X_2P_이유빈_260624_제과_이미진</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">35,385원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">17,692원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">823원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">35,385원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">2.33%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.식감.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.식감.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">34,357원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">34,357원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">674원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">3</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">11,452원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">5.88%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_속불편.페인포인트_.배너_분리유청.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_속불편.페인포인트_.배너_분리유청.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">30,883원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">30,883원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">312원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">3</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">10,294원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">3.03%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_매거진형_라라스윗권위_.배너_저당.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_매거진형_라라스윗권위_.배너_저당.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">30,776원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">30,776원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">290원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">4</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">7,694원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">3.77%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_씽크99.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_씽크99.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">29,610원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">29,610원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">581원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">2</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">14,805원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">3.92%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_출시기념._이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_출시기념._이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">27,946원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">27,946원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">650원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">3</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">9,315원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">6.98%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var1.릴스_초코맛강조.X_2P_이유빈_260624_제과_이미진_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var1.릴스_초코맛강조.X_2P_이유빈_260624_제과_이미진_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var1.릴스_초코맛강조.X_2P_이유빈_260624_제과_이미진</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">25,593원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">12,796원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">711원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">25,593원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">2.78%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트2.꿀.추가.__이유빈_260625_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트2.꿀.추가.__이유빈_260625_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">21,416원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">21,416원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">892원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">5</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">4,283원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">20.83%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var2.릴스_패인포인트.X_2P_이유빈_260624_제과_윤성미_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var2.릴스_패인포인트.X_2P_이유빈_260624_제과_윤성미_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var2.릴스_패인포인트.X_2P_이유빈_260624_제과_윤성미</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">20,707원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">10,354원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">609원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">20,707원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">2.94%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_선착순.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_선착순.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">19,951원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">9,976원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">644원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">19,951원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">3.23%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.압도적.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.압도적.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">19,913원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">19,913원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">553원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">2</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">9,956원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">5.56%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트3.건강관리.끊으신분.__이유빈_260625_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트3.건강관리.끊으신분.__이유빈_260625_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">19,845원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">19,845원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">863원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">19,845원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">4.35%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_곡물아는맛_.배너_꼬숩두유.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_곡물아는맛_.배너_꼬숩두유.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">19,638원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">6,546원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">701원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">4</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">4,910원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">14.29%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">3일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_죄송합니다.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_죄송합니다.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">19,257원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">9,628원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">438원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">4</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">4,814원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">9.09%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_속세맛.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_속세맛.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">19,181원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">19,181원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">457원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">6</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">3,197원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">14.29%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑종류.식감.초코크런치.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑종류.식감.초코크런치.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">18,871원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">18,871원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">497원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">18,871원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">2.63%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_페인포인트_.배너_분리유청.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_페인포인트_.배너_분리유청.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">18,833원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">18,833원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">554원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">2</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">9,416원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">5.88%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_초코속세맛_.배너_생초코파인트.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_초코속세맛_.배너_생초코파인트.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">18,396원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">18,396원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">1,533원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var6.릴스_토핑양.숏.X_2P_이유빈_260624_제과_윤성미_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var6.릴스_토핑양.숏.X_2P_이유빈_260624_제과_윤성미_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var6.릴스_토핑양.숏.X_2P_이유빈_260624_제과_윤성미</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">17,039원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">17,039원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">516원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">17,039원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">3.03%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var1.릴스_다이어트 권위.X_2P_이유빈_260624_제과_이봄1_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var1.릴스_다이어트 권위.X_2P_이유빈_260624_제과_이봄1_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var1.릴스_다이어트 권위.X_2P_이유빈_260624_제과_이봄1</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">16,766원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">16,766원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">599원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">2</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">8,383원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">7.14%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_10일.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_혜택강조형_스타터팩_.배너_10일.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">15,159원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">15,159원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">330원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">4</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">3,790원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">8.70%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.찐속세맛.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.찐속세맛.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">15,070원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">15,070원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">837원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">15,070원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">5.56%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_맛없는식단.페인포인트_.배너_다이어트.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_맛없는식단.페인포인트_.배너_다이어트.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">14,484원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">14,484원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">658원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">14,484원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">4.55%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트5.건강식배신.폭탄.__이유빈_260625_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트5.건강식배신.폭탄.__이유빈_260625_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">14,227원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">14,227원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">619원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">14,227원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">4.35%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_곡물속세맛_.배너_미숫가루.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_곡물속세맛_.배너_미숫가루.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">13,032원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">6,516원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">814원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">13,032원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">6.25%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트1.설탕양.비법.__이유빈_260625_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트1.설탕양.비법.__이유빈_260625_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">12,824원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">12,824원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">802원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">12,824원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">6.25%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트5.건강식배신.알고보니.__이유빈_260625_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트5.건강식배신.알고보니.__이유빈_260625_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">12,058원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">12,058원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">709원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var3.릴스_개당가혜택.X_2P_이유빈_260624_제과_이미진_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var3.릴스_개당가혜택.X_2P_이유빈_260624_제과_이미진_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var3.릴스_개당가혜택.X_2P_이유빈_260624_제과_이미진</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">11,936원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">5,968원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">1,085원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">11,936원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">9.09%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_main.릴스_본론.X_2P_이유빈_260624_제과_윤성미_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_main.릴스_본론.X_2P_이유빈_260624_제과_윤성미_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_main.릴스_본론.X_2P_이유빈_260624_제과_윤성미</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">11,121원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">3,707원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">530원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">11,121원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">4.76%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">3일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트4.카페시럽.빼면.__이유빈_260625_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트4.카페시럽.빼면.__이유빈_260625_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">10,861원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">10,861원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">2,172원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var2.릴스_라라스윗 권위.X_2P_이유빈_260624_제과_이봄1_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var2.릴스_라라스윗 권위.X_2P_이유빈_260624_제과_이봄1_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_인플루언서_var2.릴스_라라스윗 권위.X_2P_이유빈_260624_제과_이봄1</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">10,695원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">5,348원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">713원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_생초코파인트.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_생초코파인트.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">9,336원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">4,668원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">934원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_속불편.페인포인트_.배너_분리유청.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_속불편.페인포인트_.배너_분리유청.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">8,226원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">8,226원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">457원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">2</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">4,113원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">11.11%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_제품강조형_혼합아는맛_.배너_초코크런치.곡물크런치.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_제품강조형_혼합아는맛_.배너_초코크런치.곡물크런치.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">6,103원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">6,103원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">678원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_밍밍함.페인포인트_.배너_진한맛.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_밍밍함.페인포인트_.배너_진한맛.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">5,759원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">5,759원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">1,440원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">5,759원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">25.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_초코아는맛_.배너_생초코파인트.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_초코아는맛_.배너_생초코파인트.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">5,733원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">5,733원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">637원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">5,733원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">11.11%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_밍밍함.페인포인트_.배너_진한맛.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_밍밍함.페인포인트_.배너_진한맛.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">5,490원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">2,745원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">610원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">5,490원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">11.11%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_미숫가루.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_미숫가루.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">4,945원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">4,945원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">450원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">3</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">1,648원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">27.27%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트1.설탕양.꼬숩달달.__이유빈_260625_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_매거진형_미숫가루_.배너_페인포인트1.설탕양.꼬숩달달.__이유빈_260625_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">4,545원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">4,545원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">568원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">4,545원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">12.50%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var3.릴스_페르소나.X_2P_이유빈_260624_제과_윤성미_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var3.릴스_페르소나.X_2P_이유빈_260624_제과_윤성미_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_신규BP_고객검증형_var3.릴스_페르소나.X_2P_이유빈_260624_제과_윤성미</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">3,325원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">1,662원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">302원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">2</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">1,662원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">18.18%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_간편함.페인포인트_.배너_3초.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_간편함.페인포인트_.배너_3초.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">3,221원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">1,610원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">1,074원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑종류.식감.8종.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑종류.식감.8종.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">2,589원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">1,294원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">863원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_곡물그대로.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_곡물그대로.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">2,398원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">2,398원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">799원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_고디바.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_혜택강조형_개당가_.배너_고디바.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">2,144원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">1,072원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">429원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_초코아는맛_.배너_초코라떼.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_초코아는맛_.배너_초코라떼.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">1,883원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">942원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">628원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.식감.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.식감.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">1,453원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">726원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">291원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card has-video" data-grade="집행" data-product="SK혼" data-media="video" data-video="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var2.릴스_곡물맛강조.X_2P_이유빈_260624_제과_이미진_video.mp4">
+            <div class="card-img">
+                <img src="images/[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var2.릴스_곡물맛강조.X_2P_이유빈_260624_제과_이미진_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                <div class="play-icon">▶</div>
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_V_SK혼_전환_단백질쉐이크출시_맛인지형_먹스타_var2.릴스_곡물맛강조.X_2P_이유빈_260624_제과_이미진</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">1,435원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">718원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">1,435원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">1,435원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">100.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_말티톨.페인포인트_.배너_성분.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_말티톨.페인포인트_.배너_성분.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">882원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">882원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">882원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">1</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">882원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">100.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#34C759"></span><span class="status-txt" style="color:#34C759">게재중</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.압도적.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.압도적.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">821원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">410원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">821원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.압도적.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑양.압도적.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">703원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">352원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">352원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_말티톨.페인포인트_.배너_성분.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_말티톨.페인포인트_.배너_성분.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">696원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">348원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">696원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK초" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_초코속세맛_.배너_초코라떼.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK초_전환_단백질쉐이크출시_제품강조형_초코속세맛_.배너_초코라떼.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">372원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">186원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">186원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_맛없는식단.페인포인트_.배너_다이어트.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_맛없는식단.페인포인트_.배너_다이어트.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">337원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">337원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">1일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK혼" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK혼_전환_단백질쉐이크출시_제품강조형_혼합속세맛_.배너_생초코파인트.꼬숩두유.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK혼_전환_단백질쉐이크출시_제품강조형_혼합속세맛_.배너_생초코파인트.꼬숩두유.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">331원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">166원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑종류.식감.원물.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑종류.식감.원물.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">253원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">126원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">253원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+        <div class="card" data-grade="집행" data-product="SK곡" data-media="image">
+            <div class="card-img">
+                <img src="images/[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑종류.식감.6종.__이유빈_260623_제과_김나현_thumb.jpg" alt="광고 미디어" onerror="this.style.display='none'">
+                
+
+            </div>
+            <div class="card-body">
+                <p class="ad-name">[26.06]F_I_SK곡_전환_단백질쉐이크출시_제품강조형_토핑_.배너_포만감.토핑종류.식감.6종.__이유빈_260623_제과_김나현</p>
+                <div class="metrics">
+                    <div class="metric"><span class="label">총 광고비</span><span class="value">240원</span></div>
+                    <div class="metric"><span class="label">일 평균 광고비</span><span class="value">120원</span></div>
+                    <div class="metric"><span class="label">CPC</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환 수</span><span class="value">0</span></div>
+                    <div class="metric"><span class="label">전환당 비용</span><span class="value">0원</span></div>
+                    <div class="metric"><span class="label">전환률</span><span class="value">0.00%</span></div>
+                    <div class="metric">
+                        <span class="label">집행일수</span>
+                        <span class="value">2일 <span class="status-dot" style="background:#8A8A9A"></span><span class="status-txt" style="color:#8A8A9A">게재완료</span></span>
+                    </div>
+                </div>
+                <div class="periods"><span class="period-tag">2026-05-27~2026-06-26</span></div>
+            </div>
+        </div>
+</div>
+<div class="modal" id="videoModal">
+  <button class="modal-close" id="modalClose">&times;</button>
+  <video id="modalVideo" controls></video>
+</div>
+<script>
+  const cards = [...document.querySelectorAll('.card')];
+  const countEl = document.getElementById('count');
+  let activeGrade = 'all';
+  let activeProduct = 'all';
+  let activeMedia = 'image';
+
+  function applyFilters() {
+    let v = 0;
+    cards.forEach(c => {
+      const gradeOk = activeGrade === 'all' || c.dataset.grade === activeGrade;
+      const productOk = activeProduct === 'all' || c.dataset.product === activeProduct;
+      const mediaOk = c.dataset.media === activeMedia;
+      const show = gradeOk && productOk && mediaOk;
+      c.style.display = show ? '' : 'none';
+      if (show) v++;
+    });
+    countEl.textContent = v + '개';
+  }
+
+  applyFilters();
+
+  document.querySelectorAll('.media-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.media-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeMedia = btn.dataset.media;
+      applyFilters();
+    });
+  });
+
+  document.querySelectorAll('.grade-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeGrade = btn.dataset.grade;
+      applyFilters();
+    });
+  });
+
+  document.querySelectorAll('.product-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.product-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeProduct = btn.dataset.product;
+      applyFilters();
+    });
+  });
+
+  // ── 영상 모달 ──
+  const modal = document.getElementById('videoModal');
+  const modalVideo = document.getElementById('modalVideo');
+  const modalClose = document.getElementById('modalClose');
+
+  // 저장된 영상 → 모달 재생
+  document.querySelectorAll('.card.has-video').forEach(card => {
+    card.addEventListener('click', () => {
+      const src = card.dataset.video;
+      if (!src) return;
+      modalVideo.src = src;
+      modal.classList.add('open');
+      modalVideo.play().catch(() => {});
+    });
+  });
+
+  // 다운로드 불가 영상 → 메타 페이지로 이동
+  document.querySelectorAll('.card.has-permalink').forEach(card => {
+    card.addEventListener('click', () => {
+      const url = card.dataset.permalink;
+      if (!url) return;
+      window.open(url, '_blank');
+    });
+  });
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modalVideo.pause();
+    modalVideo.src = '';
+  }
+  modalClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>

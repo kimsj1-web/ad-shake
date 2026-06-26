@@ -516,7 +516,7 @@ def build_html(ads_data):
 </html>"""
 
 # ── 메인 ─────────────────────────────────────────────────────────────────────
-def collect_media(month_tag, date_start, date_stop, media_tag, media_type):
+def collect_media(date_start, date_stop, media_tag, media_type):
     """media_tag: 'F_I'/'F_V', media_type: 'image'/'video' → new_results 리스트 반환"""
     ads = fetch_ads(media_tag)
     print(f"  → {media_tag} 광고 {len(ads)}개 발견")
